@@ -57,6 +57,8 @@ async function getByScore(scoreFilter: "gt" | "lte") {
 		scoreFilter,
 	});
 
+	console.log(recommendations);
+
 	if (recommendations.length > 0) {
 		return recommendations;
 	}
