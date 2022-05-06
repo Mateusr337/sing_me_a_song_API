@@ -127,18 +127,4 @@ describe("GET /recommendations/random", () => {
 		expect(res.status).toEqual(200);
 		expect(res.body.length).toBeGreaterThan(0);
 	});
-
-	it("should answer with array with one object", async () => {
-		const recommendation = await createRecommendation();
-
-		await prisma.recommendation.update({
-			where: { id: recommendation.id },
-			data: { score: 20 },
-		});
-
-		const res = await agent.get(`/recommendations/top/${0}`);
-
-		expect(res.status).toEqual(200);
-		expect(res.body.length).toEqual(0);
-	});
 });
