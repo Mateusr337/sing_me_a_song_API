@@ -4,12 +4,27 @@ import app from "../../src/app.js";
 import { jest } from "@jest/globals";
 import { recommendationRepository } from "../../src/repositories/recommendationRepository.js";
 import { recommendationData } from "../factories/recommendations.js";
+import { conflictError } from "../../src/utils/errorUtils.js";
 
 const agent = supertest(app);
 
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.resetAllMocks();
+});
+
+describe("POST /recommendations", () => {
+	it("should answer with status 409", async () => {
+		const recommendation = recommendationData(0);
+
+		jest.spyOn(recommendationRepository, "findByName").mockResolvedValueOnce(
+			recommendation
+		);
+
+		expect(async () => {
+			await recommendationService.insert(recommendation);
+		}).rejects.toEqual(conflictError("Recommendations names must be unique"));
+	});
 });
 
 describe("GET /recommendations/random", () => {
@@ -87,7 +102,9 @@ describe("POST /down vote", () => {
 		jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(
 			recommendation
 		);
-		jest.spyOn(recommendationRepository, "updateScore").mockResolvedValueOnce(null);
+		jest.spyOn(recommendationRepository, "updateScore").mockResolvedValueOnce(
+			recommendation
+		);
 
 		const remove = jest
 			.spyOn(recommendationRepository, "remove")
